@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import CharacterList from "./characterList";
 
 
 function Home() {
@@ -8,17 +9,25 @@ function Home() {
     const BASE_URL = 'http://localhost:3000/api/'
     const CHARACTER_URL = BASE_URL+'characters'
 
-    function getCharacters() {
-        try {
-            fetch(CHARACTER_URL)
-            .then(response => response.json())
-            .then(data => setCharacters(data.message))
-        } catch {
-
-        }
+    async function getCharacters() {
+        console.log("Start getCharacters")
+        let myHeaders = new Headers({ "Content-Type": "application/json" });
+        var myInit = { method: 'GET', headers: myHeaders, mode: 'cors' };
+        let promise = fetch(CHARACTER_URL, myInit);
+        return promise.then((response) => {
+            // console.log("Response",response.json())
+            return response.text();
+        });
     }
 
-    useEffect(() => {getCharacters()},[])
+    useEffect(() => {     
+            let promise = getCharacters();
+            promise.then(
+                (data) => {
+                    setCharacters(JSON.parse(data));
+                }
+            )
+    },[])
 
     return (
         <>
@@ -29,7 +38,7 @@ function Home() {
         <input id="searchString" oninput="filterCharacters()" autocomplete="off" />
         </div>
         <section id="charactersList">
-                {characters}
+                <CharacterList characters={characters}/>
         </section>
   </>
     )

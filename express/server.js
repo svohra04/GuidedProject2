@@ -2,14 +2,22 @@ const express = require('express');
 
 const app = express();
 
+app.use((req, res, next) => {
+    res.setHeader("Access-Control-Allow-Headers", "*");
+    res.header("Access-Control-Allow-Origin", "*");
+    next();
+});
+
 app.use(express.json()); //Parse JSON body 
+
 
 const dao = require("./data_access.js")
 
 
 // Find All Characters
 app.get("/api/characters", function(req, res) {
-    dao.call('findAllCharacters', {}, (result) => {
+    console.log("Start of find all characters")
+    dao.getAllCharacters({}, (result) => {
         if (result.characters !== undefined) {
             res.send(result.characters);
         } else {
@@ -17,6 +25,7 @@ app.get("/api/characters", function(req, res) {
             res.end();
         }
     })
+    console.log("End of find all char")
 })
 
 
