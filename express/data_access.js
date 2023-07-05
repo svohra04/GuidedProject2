@@ -16,7 +16,6 @@ const films_planets = "films_planets"
 const films_characters = "films_characters"
 
 
-
 module.exports.call = async function call(operation, parameters, callback) {
     // connect to the db server
     await client.connect();
@@ -24,56 +23,68 @@ module.exports.call = async function call(operation, parameters, callback) {
     // set the database to use
     const db = client.db(dbName);
     // set the collection to use
-    const collection = db.collection(filmsCollection);
-    const collection2 = db.collection(planetsCollection);
-    const collection3 = db.collection(charactersCollection);
-    const collection4 = db.collection(films_planets);
-    const collection5 = db.collection(films_characters);
+    const filmsCol = db.collection(filmsCollection);
+    const planetsCol = db.collection(planetsCollection);
+    const charactersCol = db.collection(charactersCollection);
+    const filmsPlanetsCol = db.collection(films_planets);
+    const filmsCharactersCol = db.collection(films_characters);
 
     switch (operation.toLowerCase()) {
         case 'findallcharacters':
-            const characters = await collection.find({}).toArray();
+            const characters = await charactersCol.find({}).toArray();
             callback({ characters: characters });
             break;
         case 'findallfilms':
-            const films = await collection.find({}).toArray();
+            const films = await filmsCol.find({}).toArray();
             callback({ films: films });
             break;
         case 'findallplanets':
-            const planets = await collection.find({}).toArray();
+            const planets = await planetsCol.find({}).toArray();
             callback({ planets: planets });
             break;
         case 'findcharacterbyid':
-            const characterById = await collection.find({}).toArray();
-            callback({ characterById: characterById });
+            const character = await charactersCol.findOne({ id: Number(parameters.id) });
+            callback({ character: character });
             break;
         case 'findfilmbyid':
-            const filmById = await collection.find({}).toArray();
-            callback({ filmById: filmById });
+            const film = await filmsCol.findOne({ id: Number(parameters.id) });
+            callback({ film: film });
             break;
         case 'findplanetbyid':
-            const planetById = await collection.find({}).toArray();
-            callback({ planetById: planetById });
+            const planet = await planetsCol.findOne({ id: Number(parameters.id) });
+            callback({ planet: planet });
             break;
         case 'findcharactersbyfilm':
-            const charactersByFilm = await collection.find({}).toArray();
-            callback({ charactersByFilm: charactersByFilm });
+            const characterIdsData = await filmsCharactersCol.find({ film_id: Number(parameters.id) }).project({character_id: 1}).toArray();
+            const characterIds = characterIdsData.map(doc => doc.character_id)
+
+            const charactersByFilm = await charactersCol.find({ id: {$in: characterIds} }).toArray();
+            callback({ characters: charactersByFilm });
             break;
         case 'findplanetsbyfilm':
-            const planetsByFilm = await collection.find({}).toArray();
-            callback({ planetsByFilm: planetsByFilm });
+            const planetIdsData = await filmsPlanetsCol.find({ film_id: Number(parameters.id) }).project({planet_id: 1}).toArray();
+            const planetIds = planetIdsData.map(doc => doc.planet_id)
+
+            const planetsByFilm = await planetsCol.find({ id: {$in: planetIds} }).toArray();
+            callback({ planets: planetsByFilm });
             break;
         case 'findfilmsbycharacter':
-            const filmsByCharacter = await collection.find({}).toArray();
-            callback({ filmsByCharacter: filmsByCharacter });
+            const filmIdsByCharData = await filmsCharactersCol.find({ character_id: Number(parameters.id) }).project({film_id: 1}).toArray();
+            const filmIdsByChar = filmIdsByCharData.map(doc => doc.film_id)
+
+            const filmsByChar = await filmsCol.find({ id: {$in: filmIdsByChar} }).toArray();
+            callback({ films: filmsByChar });
             break;
         case 'findfilmsbyplanet':
-            const filmsByPlanet = await collection.find({}).toArray();
-            callback({ filmsByPlanet: filmsByPlanet });
+            const filmIdsByPlanetData = await filmsPlanetsCol.find({ planet_id: Number(parameters.id) }).project({film_id: 1}).toArray();
+            const filmIdsByPlanet = filmIdsByPlanetData.map(doc => doc.film_id)
+
+            const filmsByPlanet = await filmsCol.find({ id: {$in: filmIdsByPlanet} }).toArray();
+            callback({ films: filmsByPlanet });
             break;
         case 'findcharactersbyplanet':
-            const charactersByPlanet = await collection.find({}).toArray();
-            callback({ charactersByPlanet: charactersByPlanet });
+            const charactersByPlanet = await charactersCol.find({ homeworld: Number(parameters.id) }).toArray();
+            callback({ characters: charactersByPlanet });
             break;
         default:
             break;
