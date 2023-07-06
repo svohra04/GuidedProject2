@@ -61,7 +61,7 @@ app.get("/api/characters/:id", (req, res) => {
 
     if (!characterId) {res.status(400).send('Invalid request')}
 
-    dao.call('findCharacterById', { id: characterId }, (result) => {
+    dao.getCharacterById({ id: characterId }, (result) => {
         if (result.character !== undefined) {
             res.send(result.character);
         } else {
@@ -95,7 +95,7 @@ app.get("/api/planets/:id", (req, res) => {
 
     if (!planetId) {res.status(400).send('Invalid request')}
 
-    dao.call('findPlanetById', { id: planetId }, (result) => {
+    dao.getPlanetById( { id: planetId }, (result) => {
         if (result.planet !== undefined) {
             res.send(result.planet);
         } else {

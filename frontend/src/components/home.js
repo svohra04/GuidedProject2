@@ -10,12 +10,10 @@ function Home() {
     const CHARACTER_URL = BASE_URL+'characters'
 
     async function getCharacters() {
-        console.log("Start getCharacters")
         let myHeaders = new Headers({ "Content-Type": "application/json" });
         var myInit = { method: 'GET', headers: myHeaders, mode: 'cors' };
         let promise = fetch(CHARACTER_URL, myInit);
         return promise.then((response) => {
-            // console.log("Response",response.json())
             return response.text();
         });
     }
