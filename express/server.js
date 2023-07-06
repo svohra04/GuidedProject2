@@ -2,14 +2,22 @@ const express = require('express');
 
 const app = express();
 
+app.use((req, res, next) => {
+    res.setHeader("Access-Control-Allow-Headers", "*");
+    res.header("Access-Control-Allow-Origin", "*");
+    next();
+});
+
 app.use(express.json()); //Parse JSON body 
+
 
 const dao = require("./data_access.js")
 
 
 // Find All Characters
 app.get("/api/characters", function(req, res) {
-    dao.call('findAllCharacters', {}, (result) => {
+    console.log("Start of find all characters")
+    dao.getAllCharacters({}, (result) => {
         if (result.characters !== undefined) {
             res.send(result.characters);
         } else {
@@ -17,6 +25,7 @@ app.get("/api/characters", function(req, res) {
             res.end();
         }
     })
+    console.log("End of find all char")
 })
 
 
@@ -52,7 +61,7 @@ app.get("/api/characters/:id", (req, res) => {
 
     if (!characterId) {res.status(400).send('Invalid request')}
 
-    dao.call('findCharacterById', { id: characterId }, (result) => {
+    dao.getCharacterById({ id: characterId }, (result) => {
         if (result.character !== undefined) {
             res.send(result.character);
         } else {
@@ -86,7 +95,7 @@ app.get("/api/planets/:id", (req, res) => {
 
     if (!planetId) {res.status(400).send('Invalid request')}
 
-    dao.call('findPlanetById', { id: planetId }, (result) => {
+    dao.getPlanetById( { id: planetId }, (result) => {
         if (result.planet !== undefined) {
             res.send(result.planet);
         } else {

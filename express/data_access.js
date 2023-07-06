@@ -16,6 +16,46 @@ const films_planets = "films_planets"
 const films_characters = "films_characters"
 
 
+module.exports.getAllCharacters = async function getAllCharacters(parameters, callback) {
+    await client.connect();
+
+    // set the database to use
+    const db = client.db(dbName);
+
+    const characters = await db.collection(charactersCollection).find({}).toArray();
+    callback({ characters: characters });
+
+    console.log("Success getAllCharacters");
+    // client.close();
+}
+
+module.exports.getCharacterById = async function getCharacterById(parameters, callback) {
+    await client.connect();
+
+    // set the database to use
+    const db = client.db(dbName);
+
+    const character = await db.collection(charactersCollection).findOne({ id: Number(parameters.id) });
+    callback({ character: character });
+
+    console.log("Success getCharacterById");
+    // client.close();
+}
+
+module.exports.getPlanetById = async function getPlanetById(parameters, callback) {
+    await client.connect();
+
+    // set the database to use
+    const db = client.db(dbName);
+
+    const planet = await db.collection(planetsCollection).findOne({ id: Number(parameters.id) });
+    callback({ planet: planet });
+
+    console.log("Success getPlanetById");
+    // client.close();
+}
+
+
 module.exports.call = async function call(operation, parameters, callback) {
     // connect to the db server
     await client.connect();
@@ -31,7 +71,7 @@ module.exports.call = async function call(operation, parameters, callback) {
 
     switch (operation.toLowerCase()) {
         case 'findallcharacters':
-            const characters = await charactersCol.find({}).toArray();
+            const characters = await db.collection(charactersCollection).find({}).toArray();
             callback({ characters: characters });
             break;
         case 'findallfilms':
@@ -90,7 +130,7 @@ module.exports.call = async function call(operation, parameters, callback) {
             break;
     }
     console.log( 'call complete: ' + operation );
-    client.close();
+    // client.close();
     return 'call complete';
 }
 
